@@ -1,25 +1,13 @@
 #pragma once
 
 #include <stdbool.h>
-
-/**
- * Here you should specify which features do you want to implement via macros:
- * NEED_DETACH and NEED_TIMED_JOIN. If you want to enable detach, do:
- *
- *     #define NEED_DETACH
- *
- * To enable timed join do:
- *
- *     #define NEED_TIMED_JOIN
- *
- * It is important to define these macros here, in the header, because it is
- * used by tests.
- */
+#ifndef THREAD_POOL_DEFINED
+#define THREAD_POOL_DEFINED
 
 struct thread_pool;
 struct thread_task;
 
-typedef void *(*thread_task_f)(void *);
+typedef void* (*thread_task_f)(void*);
 
 enum {
 	TPOOL_MAX_THREADS = 20,
@@ -33,7 +21,6 @@ enum thread_poool_errcode {
 	TPOOL_ERR_TASK_NOT_PUSHED,
 	TPOOL_ERR_TASK_IN_POOL,
 	TPOOL_ERR_NOT_IMPLEMENTED,
-	TPOOL_ERR_TIMEOUT,
 };
 
 /** Thread pool API. */
@@ -50,7 +37,7 @@ enum thread_poool_errcode {
  *       or 0.
  */
 int
-thread_pool_new(int max_thread_count, struct thread_pool **pool);
+thread_pool_new(int max_thread_count, struct thread_pool** pool);
 
 /**
  * How many threads are created by this pool. Can be less than
@@ -59,7 +46,7 @@ thread_pool_new(int max_thread_count, struct thread_pool **pool);
  * @retval Thread count.
  */
 int
-thread_pool_thread_count(const struct thread_pool *pool);
+thread_pool_thread_count(const struct thread_pool* pool);
 
 /**
  * Delete @a pool, free its memory.
@@ -69,7 +56,7 @@ thread_pool_thread_count(const struct thread_pool *pool);
  *     - TPOOL_ERR_HAS_TASKS - pool still has tasks.
  */
 int
-thread_pool_delete(struct thread_pool *pool);
+thread_pool_delete(struct thread_pool* pool);
 
 /**
  * Push @a task into thread pool queue.
@@ -82,7 +69,7 @@ thread_pool_delete(struct thread_pool *pool);
  *       already.
  */
 int
-thread_pool_push_task(struct thread_pool *pool, struct thread_task *task);
+thread_pool_push_task(struct thread_pool* pool, struct thread_task* task);
 
 /** Thread pool task API. */
 
@@ -95,21 +82,21 @@ thread_pool_push_task(struct thread_pool *pool, struct thread_task *task);
  * @retval Always 0.
  */
 int
-thread_task_new(struct thread_task **task, thread_task_f function, void *arg);
+thread_task_new(struct thread_task** task, thread_task_f function, void* arg);
 
 /**
  * Check if @a task is finished and its result can be obtained.
  * @param task Task to check.
  */
 bool
-thread_task_is_finished(const struct thread_task *task);
+thread_task_is_finished(const struct thread_task* task);
 
 /**
  * Check if @a task is running right now.
  * @param task Task to check.
  */
 bool
-thread_task_is_running(const struct thread_task *task);
+thread_task_is_running(const struct thread_task* task);
 
 /**
  * Join the task. If it is not finished, then wait until it is.
@@ -123,26 +110,7 @@ thread_task_is_running(const struct thread_task *task);
  *     - TPOOL_ERR_TASK_NOT_PUSHED - task is not pushed to a pool.
  */
 int
-thread_task_join(struct thread_task *task, void **result);
-
-#ifdef NEED_TIMED_JOIN
-
-/**
- * Like thread_task_join() but wait no longer than the timeout.
- * @param task Task to join.
- * @param timeout Timeout in seconds. 0 means no waiting at all. For an infinite
- *   timeout pass infinity or DBL_MAX or just something huge.
- * @param[out] result Pointer to stored result of @a task.
- *
- * @retval 0 Success.
- * @retval != 0 Error code.
- *     - TPOOL_ERR_TASK_NOT_PUSHED - task is not pushed to a pool.
- *     - TPOOL_ERR_TIMEOUT - join timed out, nothing is done.
- */
-int
-thread_task_timed_join(struct thread_task *task, double timeout, void **result);
-
-#endif
+thread_task_join(struct thread_task* task, void** result);
 
 /**
  * Delete a task, free its memory.
@@ -154,7 +122,7 @@ thread_task_timed_join(struct thread_task *task, double timeout, void **result);
  *       is in a pool. Need to join it firstly.
  */
 int
-thread_task_delete(struct thread_task *task);
+thread_task_delete(struct thread_task* task);
 
 #ifdef NEED_DETACH
 
@@ -169,6 +137,8 @@ thread_task_delete(struct thread_task *task);
  *       pool.
 */
 int
-thread_task_detach(struct thread_task *task);
+thread_task_detach(struct thread_task* task);
 
 #endif
+
+#endif /* THREAD_POOL_DEFINED */
