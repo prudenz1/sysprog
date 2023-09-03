@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
 #include "libcoro.h"
 
-/**
- * You can compile and run this code using the commands:
- *
- * $> gcc solution.c libcoro.c
- * $> ./a.out
- */
+#define out_fname "out1.txt"
 
-/**
- * A function, called from inside of coroutines recursively. Just to demonstrate
- * the example. You can split your code into multiple functions, that usually
- * helps to keep the individual code blocks simple.
- */
+struct int_arr {
+	int* start;
+	int length;
+};
+
+struct coro_args {
+	char** fnames;
+	int fnames_cnt;
+	int* global_i;
+	struct int_arr** ia_arr;
+	int coro_latency;
+};
+
+
 static void
 other_function(const char *name, int depth)
 {
