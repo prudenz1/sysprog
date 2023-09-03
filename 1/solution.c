@@ -20,7 +20,16 @@ struct coro_args {
 	int coro_latency;
 };
 
-
+void print_arr(struct int_arr* arr) {
+	printf("%p %p  || ", arr, arr->start);
+	int* ptr = arr->start;
+	printf("Arr: ");
+	for (int i = 0; i < arr->length; ++i) {
+		printf("%d ", *ptr);
+		ptr++;
+	}
+	printf(" |\n");
+}
 static void
 other_function(const char *name, int depth)
 {
