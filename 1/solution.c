@@ -31,6 +31,17 @@ void print_arr(struct int_arr* arr) {
 	printf(" |\n");
 }
 
+unsigned long microsec(struct timespec ts) {
+	return ts.tv_sec * (unsigned)1e6 + ts.tv_nsec / (unsigned)1e3;
+}
+
+unsigned long get_cur_time() {
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+
+	return microsec(ts);
+}
+
 void my_qsort(int* arr, int i_start, int i_end, unsigned long* t_hold, unsigned long* t_coro_iteration_start, int coro_latency) {
 	int m = arr[(i_end + i_start) / 2];
 
