@@ -30,6 +30,53 @@ void print_arr(struct int_arr* arr) {
 	}
 	printf(" |\n");
 }
+
+void my_qsort(int* arr, int i_start, int i_end, unsigned long* t_hold, unsigned long* t_coro_iteration_start, int coro_latency) {
+	int m = arr[(i_end + i_start) / 2];
+
+	int i = i_start;
+	int j = i_end;
+
+	do {
+		while (arr[i] < m) {
+			i++;
+		}
+
+		while (arr[j] > m) {
+			j--;
+		}
+
+		if (i <= j) {
+			int temp = arr[i];
+			arr[i] = arr[j];
+			arr[j] = temp;
+
+			i++;
+			j--;
+
+			unsigned long passed_time_since_iteration = get_cur_time() - *t_coro_iteration_start;
+			if (passed_time_since_iteration >= coro_latency) {
+				size_t t1 = get_cur_time();
+
+				coro_yield(); // ==================== YIELD HERE =================
+
+				size_t t2 = get_cur_time();
+				*t_coro_iteration_start = t2;
+
+				size_t diff = t2 - t1;
+				*t_hold += diff;
+			}
+		}
+	} while (i <= j);
+
+	if (j > i_start) {
+		my_qsort(arr, i_start, j, t_hold, t_coro_iteration_start, coro_latency);
+	}
+	if (i < i_end) {
+		my_qsort(arr, i, i_end, t_hold, t_coro_iteration_start, coro_latency);
+	}
+}
+
 static void
 other_function(const char *name, int depth)
 {
